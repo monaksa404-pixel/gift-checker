@@ -71,6 +71,7 @@
         <label>Select Gift Card</label>
         <div class="select-wrap">
           <select id="giftCardSelect" onchange="updateSelectIcon()">
+            <option value="" data-emoji="💳" selected disabled>Select Gift Card</option>
             <option value="itunes" data-emoji="🎵">iTunes</option>
             <option value="razer" data-emoji="🟡">Razer Gold</option>
             <option value="pubg" data-emoji="🎮">PUBG</option>
@@ -89,10 +90,9 @@
             <option value="riot" data-emoji="🎮">Riot Games</option>
             <option value="roblox" data-emoji="🎮">Roblox</option>
             <option value="steam" data-emoji="🎮">Steam</option>
-            <option value="itunes_jpg" data-emoji="🎵">iTunes (JPEG)</option>
             <option value="xbox" data-emoji="🎮">Xbox</option>
           </select>
-          <span class="select-icon" id="selectIcon">🎵</span>
+          <span class="select-icon" id="selectIcon">💳</span>
           <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/></svg>
         </div>
       </div>
@@ -159,35 +159,35 @@
     <div class="popular-cards-grid">
       <div class="pop-card" onclick="selectCard('itunes')">
         <div class="pop-img-wrap">
-          <img src="public/images/itunes_new.avif" alt="iTunes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="public/images/itunes.png" alt="iTunes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#6d28d9,#ec4899)"><span style="color:white;font-size:1rem">🎵</span></div>
         </div>
         <p>iTunes</p>
       </div>
       <div class="pop-card" onclick="selectCard('razer')">
         <div class="pop-img-wrap">
-          <img src="public/images/razer_recent.avif" alt="Razer Gold" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="public/images/razer_recent.png" alt="Razer Gold" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#111,#222)"><span style="color:#ffd700;font-size:0.5rem;font-weight:900;text-align:center">RAZER<br>GOLD</span></div>
         </div>
         <p>Razer Gold</p>
       </div>
       <div class="pop-card" onclick="selectCard('pubg')">
         <div class="pop-img-wrap">
-          <img src="public/images/pubg.avif" alt="PUBG" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="public/images/pubg.png" alt="PUBG" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#0f766e,#fbbf24)"><span style="color:#fef3c7;font-size:0.55rem;font-weight:900">PUBG</span></div>
         </div>
         <p>PUBG</p>
       </div>
       <div class="pop-card" onclick="selectCard('stc')">
         <div class="pop-img-wrap">
-          <img src="public/images/stc.avif" alt="STC" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="public/images/stc.png" alt="STC" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#4c1d95,#7c3aed)"><span style="color:white;font-weight:900;font-size:0.7rem">stc</span></div>
         </div>
         <p>STC</p>
       </div>
       <div class="pop-card" onclick="selectCard('mobily')">
         <div class="pop-img-wrap">
-          <img src="public/images/mobily.avif" alt="Mobily" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img src="public/images/mobily.png" alt="Mobily" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6)"><span style="color:white;font-size:0.55rem;font-weight:700">Mobily</span></div>
         </div>
         <p>Mobily</p>
