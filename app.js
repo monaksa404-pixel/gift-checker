@@ -14,13 +14,13 @@ const CAROUSEL_GAP = 10;
 
 let carouselPage = 0;
 
-/** Narrow viewports: 4 cards per “page” → 5 pages, 5 dots. Wider: 5 per page → 4 pages. */
+/** Narrow viewports: 3 cards per page for better width/visibility. */
 function getVisibleCount() {
   const v = document.getElementById('carouselViewport');
-  if (!v) return 4;
+  if (!v) return 3;
   const w = v.clientWidth;
-  if (w < 500) return 4;
-  return 5;
+  if (w < 500) return 3;
+  return 4;
 }
 
 function getCarouselCards() {
