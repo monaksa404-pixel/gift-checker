@@ -34,7 +34,6 @@ function getCarouselCards() {
 const CAROUSEL_PLACEHOLDER_HTML = {
   itunes: { bg: 'linear-gradient(135deg,#6d28d9,#ec4899)',  inner: '<span style="color:white;font-size:2.2rem">🎵</span>' },
   razer:  { bg: 'linear-gradient(135deg,#111,#222)',         inner: '<span style="color:#ffd700;font-weight:900;font-size:1.2rem;letter-spacing:1px;text-align:center">RAZER<br><span style="font-size:0.8rem;letter-spacing:3px">GOLD</span></span>' },
-  pubg:   { bg: 'linear-gradient(135deg,#0f766e,#fbbf24)',  inner: '<span style="color:#fef3c7;font-weight:900;font-size:1rem;letter-spacing:1px">PUBG</span>' },
   stc:    { bg: 'linear-gradient(135deg,#4c1d95,#7c3aed)',  inner: '<span style="color:white;font-weight:900;font-size:1.8rem">stc</span>' },
   mobily: { bg: 'linear-gradient(135deg,#1d4ed8,#3b82f6)',  inner: '<span style="color:white;font-weight:700;font-size:1.2rem">Mobily</span>' },
   lebara: { bg: 'linear-gradient(135deg,#0369a1,#7dd3fc)',  inner: '<span style="color:white;font-weight:900;font-size:1.2rem">LEBARA</span>' },

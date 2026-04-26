@@ -22,11 +22,10 @@ const CONFIG = {
 const CAROUSEL_CARDS = [
   { slug: 'itunes',      label: 'iTunes',       img: 'public/images/itunes.png' },
   { slug: 'razer',       label: 'Razer Gold',   img: 'public/images/razer_recent.png' },
-  { slug: 'pubg',        label: 'PUBG',         img: 'public/images/pubg.png' },
+  { slug: 'du',          label: 'du',           img: 'public/images/du.png' },
   { slug: 'stc',         label: 'STC',          img: 'public/images/stc.png' },
   { slug: 'mobily',      label: 'Mobily',       img: 'public/images/mobily.png' },
   { slug: 'lebara',      label: 'Lebara',       img: 'public/images/lebara_brand.png' },
-  { slug: 'du',          label: 'du',           img: 'public/images/du.png' },
   { slug: 'freefire',    label: 'Free Fire',    img: 'public/images/freefire.png' },
   { slug: 'friendi',     label: 'Friendi',      img: 'public/images/friendi.png' },
   { slug: 'gamestop',    label: 'GameStop',     img: 'public/images/game_stop.png' },

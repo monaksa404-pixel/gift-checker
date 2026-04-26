@@ -74,7 +74,6 @@
             <option value="" data-emoji="💳" selected disabled>Select Gift Card</option>
             <option value="itunes" data-emoji="🎵">iTunes</option>
             <option value="razer" data-emoji="🟡">Razer Gold</option>
-            <option value="pubg" data-emoji="🎮">PUBG</option>
             <option value="stc" data-emoji="📶">STC</option>
             <option value="mobily" data-emoji="📱">Mobily</option>
             <option value="lebara" data-emoji="🌐">Lebara</option>
@@ -159,7 +158,7 @@
     <div class="popular-cards-grid">
       <div class="pop-card" onclick="selectCard('itunes')">
         <div class="pop-img-wrap">
-          <img src="public/images/itunes.png" alt="iTunes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img class="pop-img-itunes" src="public/images/itunes.png" alt="iTunes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#6d28d9,#ec4899)"><span style="color:white;font-size:1rem">🎵</span></div>
         </div>
         <p>iTunes</p>
@@ -171,12 +170,12 @@
         </div>
         <p>Razer Gold</p>
       </div>
-      <div class="pop-card" onclick="selectCard('pubg')">
+      <div class="pop-card" onclick="selectCard('mobily')">
         <div class="pop-img-wrap">
-          <img src="public/images/pubg.png" alt="PUBG" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
-          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#0f766e,#fbbf24)"><span style="color:#fef3c7;font-size:0.55rem;font-weight:900">PUBG</span></div>
+          <img src="public/images/mobily.png" alt="Mobily" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6)"><span style="color:white;font-size:0.55rem;font-weight:700">Mobily</span></div>
         </div>
-        <p>PUBG</p>
+        <p>Mobily</p>
       </div>
       <div class="pop-card" onclick="selectCard('stc')">
         <div class="pop-img-wrap">
