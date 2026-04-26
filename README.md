@@ -61,16 +61,23 @@ If you click **✗ Invalid**, the user sees an error message instead.
 
 ---
 
-### 5. Deploy
+### 5. Deploy (Vercel)
 
-**Vercel (this repo is configured for it):**
+This project includes `package.json` and a `build` script that copies HTML, JS, CSS, and `public/` into `dist/`. On Vercel, **set this explicitly** so the wrong framework is not auto-detected (a `public` folder with `index.html` at the repo root is often mis-detected; that can produce an **empty build** and a **404 NOT_FOUND** on `*.vercel.app`).
 
-1. Push this project to GitHub and import the repo in [Vercel](https://vercel.com).
-2. **Root directory:** the folder that contains `index.html` (e.g. `giftcard` if your repo is the parent of that folder, or `.` if the repo root is the site).
-3. **Build command:** leave empty. **Output:** default static (no framework).
-4. After deploy, the site is at `https://<your-project>.vercel.app` and the **admin** is at **`https://<your-project>.vercel.app/admin`** (or `/admin.html`—both work thanks to `vercel.json`).
+1. Import the [GitHub](https://github.com) repo in [Vercel](https://vercel.com) (or use the Vercel CLI).
+2. **Settings → General → Root Directory:** the folder that contains `index.html` and `package.json` (use `.` if they are at the repository root).
+3. **Settings → General → Framework Preset:** **Other** (or “No framework” / “N/A” — not Vite, Next, or Create React App).
+4. **Settings → Build and Deployment**
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+   - **Install Command:** `npm install` (default is fine; there are no dependencies).
+5. Save, then **Redeploy** the latest production deployment.
+6. Open `https://<your-project>.vercel.app/`. The **admin** is at **`/admin`** or **`/admin.html`** (see `vercel.json` rewrites). Same host keeps `localStorage` working for the check flow + admin.
 
-Other static hosts: Netlify, GitHub Pages, cPanel, etc. Upload the same files; use `/admin.html` if the host does not support path rewrites.
+**If you still see 404:** confirm the production deployment log shows `npm run build` finishing and “Static build: files copied to dist/”.
+
+**Other static hosts (Netlify, cPanel, etc.):** upload the same files, or run `npm run build` locally and upload the `dist/` folder. Use `/admin.html` if the host does not support rewrites.
 
 **Note:** `localStorage` is shared only when the **user page and the admin are on the same origin** (e.g. both on `yoursite.vercel.app`). Open admin on the same deployment, not a different domain.
 
@@ -87,5 +94,6 @@ app.js          — Main logic + Telegram + polling + carousel
 config.js       — Telegram credentials + CAROUSEL_CARDS (20 slider entries)
 public/
   images/       — Card art (paths in config.js)
+package.json    — `npm run build` copies the site to dist/ (Vercel)
+scripts/        — build-static.cjs (used by the build script)
 ```
-# gift-checker

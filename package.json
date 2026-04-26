@@ -1,0 +1,12 @@
+{
+  "name": "gift-checker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Static site — no framework; build only copies files to dist/ for Vercel.",
+  "scripts": {
+    "build": "node scripts/build-static.cjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

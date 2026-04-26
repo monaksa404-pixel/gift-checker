@@ -14,3 +14,6 @@ Thumbs.db
 
 # Vercel local link
 .vercel
+
+# Build output (generated on Vercel / locally)
+dist/
