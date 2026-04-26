@@ -119,19 +119,19 @@ body {
 /* TALLER cards: roughly 2× the original height */
 .card-img-wrap {
   width: 100%;
-  /* Slightly taller than before for improved visibility */
-  aspect-ratio: 3 / 5.2;
+  /* Match gift-card artwork ratio so image fills without side crop */
+  aspect-ratio: 16 / 10;
   border-radius: 12px;
   overflow: hidden;
   border: 1.5px solid var(--border);
-  background: var(--card);
+  background: #0f0f1a;
   position: relative;
   box-shadow: 0 6px 22px rgba(0,0,0,0.45);
 }
 .card-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* fill card area edge-to-edge */
+  object-fit: contain; /* show full image cleanly in full card area */
   object-position: center;
 }
 /* iTunes top card: nudge right so left "A" is not cut */
