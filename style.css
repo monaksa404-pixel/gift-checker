@@ -374,6 +374,10 @@ body {
 .pop-img-wrap .pop-img-itunes {
   object-position: center 75%;
 }
+/* Mobily also has lower branding text; push frame down a bit */
+.pop-img-wrap .pop-img-mobily {
+  object-position: center 72%;
+}
 .pop-placeholder {
   width: 100%; height: 100%;
   display: flex; align-items: center; justify-content: center; text-align: center;

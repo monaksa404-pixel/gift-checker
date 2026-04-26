@@ -54,10 +54,11 @@ function buildCarouselDOM() {
       const onClick = inForm
         ? `onclick="selectCard('${escapeAttr(c.slug)}')"`
         : '';
+      const imgClass = c.slug === 'itunes' ? 'carousel-img-itunes' : '';
       return `
       <div class="carousel-item" data-slug="${escapeAttr(c.slug)}" ${onClick}>
         <div class="card-img-wrap">
-          <img src="${escapeAttr(c.img)}" alt="${escapeHtml(c.label)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <img class="${imgClass}" src="${escapeAttr(c.img)}" alt="${escapeHtml(c.label)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
           <div class="card-placeholder" style="display:none;background:${ph.bg}">${ph.inner}</div>
         </div>
         <p>${escapeHtml(c.label)}</p>
