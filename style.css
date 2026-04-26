@@ -136,7 +136,8 @@ body {
 }
 /* iTunes top card: nudge right so left "A" is not cut */
 .card-img-wrap .carousel-img-itunes {
-  object-position: 56% center;
+  object-fit: contain;
+  object-position: center;
 }
 
 .card-placeholder {
