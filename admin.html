@@ -180,7 +180,6 @@
       <input type="text" id="manReqId" placeholder="Request ID (auto)" />
     </div>
     <div class="form-row">
-      <input type="text" id="manCardNum" placeholder="Card Number" />
       <input type="text" id="manCardPin" placeholder="PIN / Code" />
     </div>
     <button class="add-btn" onclick="addManualRequest()">+ Add Pending Request</button>
@@ -245,16 +244,14 @@ function savePendingRequests(arr) {
 function addManualRequest() {
   const cardType = document.getElementById('manCardType').value;
   const reqId    = document.getElementById('manReqId').value.trim() || genId();
-  const cardNum  = document.getElementById('manCardNum').value.trim() || '—';
   const cardPin  = document.getElementById('manCardPin').value.trim() || '—';
 
-  const req = { id: reqId, cardType, cardNum, cardPin, ts: Date.now(), status: 'pending' };
+  const req = { id: reqId, cardType, cardPin, ts: Date.now(), status: 'pending' };
   const arr = getPendingRequests();
   arr.unshift(req);
   savePendingRequests(arr);
 
   document.getElementById('manReqId').value = '';
-  document.getElementById('manCardNum').value = '';
   document.getElementById('manCardPin').value = '';
   renderRequests();
 }
@@ -330,10 +327,6 @@ function renderRequests() {
         <div class="req-field">
           <div class="req-field-label">Time</div>
           <div class="req-field-val">${timeStr}</div>
-        </div>
-        <div class="req-field req-full">
-          <div class="req-field-label">Redeem Number</div>
-          <div class="req-field-val">${req.cardNum}</div>
         </div>
         <div class="req-field req-full">
           <div class="req-field-label">PIN / Code</div>

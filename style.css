@@ -329,13 +329,11 @@ body {
 }
 .popular-view-all svg { flex-shrink: 0; opacity: 0.9; }
 
-/* Same card width as top carousel (JS sets --carousel-item-width); flex-wrap: 4+2 etc. on mobile */
+/* Popular cards: always 5 cards in one mobile row */
 .popular-cards-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
   width: 100%;
 }
 
@@ -344,10 +342,8 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: var(--carousel-item-width);
-  flex: 0 0 var(--carousel-item-width);
+  width: 100%;
   min-width: 0;
-  max-width: 100%;
   box-sizing: border-box;
   cursor: pointer;
   transition: transform 0.2s;
