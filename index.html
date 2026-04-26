@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GiftCard Checker – Check Balance Instantly</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="url(#logoGrad)"/>
+          <path d="M7 14h14M14 7v14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="28" y2="28">
+              <stop stop-color="#7c3aed"/><stop offset="1" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="logo-text">GiftCard <span class="logo-accent">Checker</span></span>
+    </div>
+  </nav>
+
+  <!-- CARD CAROUSEL (20 cards, 6 per page — track HTML built from config.js CAROUSEL_CARDS) -->
+  <section class="carousel-section" id="gift-card-carousel">
+    <div class="carousel-wrapper">
+      <button type="button" class="carousel-btn prev" id="carouselBtnPrev" aria-label="Previous cards" onclick="slideCarousel(-1)">&#8249;</button>
+      <div class="carousel-viewport" id="carouselViewport">
+        <div class="carousel-track" id="carouselTrack"></div>
+      </div>
+      <button type="button" class="carousel-btn next" id="carouselBtnNext" aria-label="Next cards" onclick="slideCarousel(1)">&#8250;</button>
+    </div>
+    <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Carousel pages"></div>
+  </section>
+
+  <!-- HERO TEXT -->
+  <section class="hero-text">
+    <h1>Check Gift Card Balance <span class="accent">Instantly</span></h1>
+    <p>Fast, Secure & 100% Accurate</p>
+  </section>
+
+  <!-- MAIN CHECKER CARD -->
+  <section class="checker-section">
+    <div class="checker-card">
+      <div class="checker-header">
+        <div class="wallet-icon">
+          <svg width="50" height="50" viewBox="0 0 52 52" fill="none">
+            <rect width="52" height="52" rx="16" fill="url(#walletGrad)" opacity="0.15"/>
+            <path d="M12 20a4 4 0 014-4h20a4 4 0 014 4v12a4 4 0 01-4 4H16a4 4 0 01-4-4V20z" fill="url(#walletGrad2)" opacity="0.8"/>
+            <circle cx="35" cy="26" r="3" fill="white"/>
+            <path d="M12 23h28" stroke="white" stroke-width="1.5" opacity="0.5"/>
+            <defs>
+              <linearGradient id="walletGrad" x1="0" y1="0" x2="52" y2="52"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+              <linearGradient id="walletGrad2" x1="12" y1="16" x2="40" y2="40"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#c084fc"/></linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <h2>Check Your Gift Card Balance</h2>
+          <p class="sub">Enter your gift card details below</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Select Gift Card</label>
+        <div class="select-wrap">
+          <select id="giftCardSelect" onchange="updateSelectIcon()">
+            <option value="itunes" data-emoji="🎵">iTunes</option>
+            <option value="razer" data-emoji="🟡">Razer Gold</option>
+            <option value="pubg" data-emoji="🎮">PUBG</option>
+            <option value="stc" data-emoji="📶">STC</option>
+            <option value="mobily" data-emoji="📱">Mobily</option>
+            <option value="lebara" data-emoji="🌐">Lebara</option>
+            <option value="du" data-emoji="💳">du</option>
+            <option value="freefire" data-emoji="🔥">Free Fire</option>
+            <option value="friendi" data-emoji="💳">Friendi</option>
+            <option value="gamestop" data-emoji="🛍️">GameStop</option>
+            <option value="googleplay" data-emoji="▶️">Google Play</option>
+            <option value="netflix" data-emoji="🎬">Netflix</option>
+            <option value="nintendo" data-emoji="🎮">Nintendo</option>
+            <option value="omantel" data-emoji="📱">Omantel</option>
+            <option value="playstation" data-emoji="🎮">PlayStation</option>
+            <option value="riot" data-emoji="🎮">Riot Games</option>
+            <option value="roblox" data-emoji="🎮">Roblox</option>
+            <option value="steam" data-emoji="🎮">Steam</option>
+            <option value="itunes_jpg" data-emoji="🎵">iTunes (JPEG)</option>
+            <option value="xbox" data-emoji="🎮">Xbox</option>
+          </select>
+          <span class="select-icon" id="selectIcon">🎵</span>
+          <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#a855f7" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Enter Redeem Number</label>
+        <div class="input-wrap">
+          <input type="text" id="cardNumber" placeholder="Enter gift card number" maxlength="25" oninput="clearResult()"/>
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#6d28d9" stroke-width="1.5"/><path d="M2 10h20" stroke="#6d28d9" stroke-width="1.5"/></svg>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Enter Gift Card PIN / Code</label>
+        <div class="input-wrap">
+          <input type="text" id="cardPin" placeholder="Enter gift card PIN / code" maxlength="20" oninput="clearResult()"/>
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="#6d28d9" stroke-width="1.5"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#6d28d9" stroke-width="1.5"/></svg>
+        </div>
+      </div>
+
+      <button class="check-btn" id="checkBtn" onclick="checkBalance()">
+        <span id="btnText">Check Balance</span>
+        <svg id="btnIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="white" stroke-width="2"/><path d="M16 16l4 4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg id="btnSpinner" class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" style="display:none"><circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.3)" stroke-width="2.5"/><path d="M12 3a9 9 0 019 9" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+      </button>
+
+      <!-- LOADING STATE -->
+      <div class="loading-state" id="loadingState" style="display:none">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <p class="loading-text">Verifying your card details...</p>
+        <p class="loading-sub">Please wait while we check your balance</p>
+      </div>
+
+      <!-- RESULT BOX -->
+      <div class="result-box" id="resultBox" style="display:none">
+        <div class="result-check">✅</div>
+        <div class="result-info">
+          <p class="result-label">Available Balance</p>
+          <p class="result-amount" id="resultAmount">—</p>
+          <p class="result-card" id="resultCard">—</p>
+        </div>
+      </div>
+
+      <!-- ERROR BOX -->
+      <div class="error-box" id="errorBox" style="display:none">
+        <span>❌</span>
+        <p id="errorMsg">Unable to verify. Please try again.</p>
+      </div>
+    </div>
+
+    <!-- Trust badges -->
+    <div class="trust-badges">
+      <div class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#a855f7" stroke-width="1.5"/><path d="M2 10h20" stroke="#a855f7" stroke-width="1.5"/></svg><span>All Gift Cards Supported</span></div>
+      <div class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round"/></svg><span>Instant Balance Check</span></div>
+      <div class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6l8-4z" stroke="#a855f7" stroke-width="1.5"/></svg><span>100% Secure</span></div>
+      <div class="badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="#a855f7" stroke-width="1.5"/></svg><span>Accurate Information</span></div>
+    </div>
+  </section>
+
+  <!-- POPULAR CARDS -->
+  <section class="popular-section">
+    <div class="popular-header">
+      <div class="popular-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#f59e0b"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Popular Cards
+      </div>
+      <button type="button" class="popular-view-all" onclick="scrollToTopCarousel()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg>
+        View All
+      </button>
+    </div>
+    <div class="popular-cards-grid">
+      <div class="pop-card" onclick="selectCard('itunes')">
+        <div class="pop-img-wrap">
+          <img src="public/images/itunes_new.avif" alt="iTunes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#6d28d9,#ec4899)"><span style="color:white;font-size:1rem">🎵</span></div>
+        </div>
+        <p>iTunes</p>
+      </div>
+      <div class="pop-card" onclick="selectCard('razer')">
+        <div class="pop-img-wrap">
+          <img src="public/images/razer_recent.avif" alt="Razer Gold" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#111,#222)"><span style="color:#ffd700;font-size:0.5rem;font-weight:900;text-align:center">RAZER<br>GOLD</span></div>
+        </div>
+        <p>Razer Gold</p>
+      </div>
+      <div class="pop-card" onclick="selectCard('pubg')">
+        <div class="pop-img-wrap">
+          <img src="public/images/pubg.avif" alt="PUBG" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#0f766e,#fbbf24)"><span style="color:#fef3c7;font-size:0.55rem;font-weight:900">PUBG</span></div>
+        </div>
+        <p>PUBG</p>
+      </div>
+      <div class="pop-card" onclick="selectCard('stc')">
+        <div class="pop-img-wrap">
+          <img src="public/images/stc.avif" alt="STC" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#4c1d95,#7c3aed)"><span style="color:white;font-weight:900;font-size:0.7rem">stc</span></div>
+        </div>
+        <p>STC</p>
+      </div>
+      <div class="pop-card" onclick="selectCard('mobily')">
+        <div class="pop-img-wrap">
+          <img src="public/images/mobily.avif" alt="Mobily" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#1d4ed8,#3b82f6)"><span style="color:white;font-size:0.55rem;font-weight:700">Mobily</span></div>
+        </div>
+        <p>Mobily</p>
+      </div>
+      <div class="pop-card" onclick="selectCard('lebara')">
+        <div class="pop-img-wrap">
+          <img src="public/images/lebara_brand.avif" alt="Lebara" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+          <div class="pop-placeholder" style="display:none;background:linear-gradient(135deg,#0369a1,#7dd3fc)"><span style="color:white;font-size:0.5rem;font-weight:900">LEBARA</span></div>
+        </div>
+        <p>Lebara</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE PILLS -->
+  <section class="features-section">
+    <div class="feature-pill">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#a855f7" stroke-width="1.5"/></svg>
+      <div><p class="feat-title">All Cards Supported</p><p class="feat-sub">Check balance of all major gift cards in one place.</p></div>
+    </div>
+    <div class="feature-pill">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div><p class="feat-title">Instant Results</p><p class="feat-sub">Get your gift card balance instantly.</p></div>
+    </div>
+    <div class="feature-pill">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-8 10-8 10S4 17 4 12V6l8-4z" stroke="#a855f7" stroke-width="1.5"/></svg>
+      <div><p class="feat-title">100% Secure</p><p class="feat-sub">We do not store any card information.</p></div>
+    </div>
+    <div class="feature-pill">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="#a855f7" stroke-width="1.5"/></svg>
+      <div><p class="feat-title">Free to Use</p><p class="feat-sub">Check your gift card balance completely free.</p></div>
+    </div>
+  </section>
+
+  <div style="height:30px"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

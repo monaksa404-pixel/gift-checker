@@ -1,0 +1,16 @@
+# Environment — do not commit (secrets or local copies of templates)
+.env
+.env.local
+.env.*.local
+.env.example
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Vercel local link
+.vercel
