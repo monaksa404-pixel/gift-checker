@@ -9,12 +9,19 @@
      5. When balance found → show result; if timeout → show error
    ================================================================ */
 
-// ── Carousel (20 items, 5 per page, dot = page) ──────────────
+// ── Carousel (20 items; per-page count depends on viewport width) ─
 const CAROUSEL_GAP = 10;
-// 6 per page so the first “hero” set (iTunes, Razer, PUBG, STC, Mobily, Lebara) fits on one slide
-const VISIBLE_COUNT = 6;
 
-let carouselPage = 0; // 0 = cards 0–5 (first slide has iTunes…Lebara), then 6–11, …
+let carouselPage = 0;
+
+/** Narrow viewports: 4 cards per “page” → 5 pages, 5 dots. Wider: 5 per page → 4 pages. */
+function getVisibleCount() {
+  const v = document.getElementById('carouselViewport');
+  if (!v) return 4;
+  const w = v.clientWidth;
+  if (w < 500) return 4;
+  return 5;
+}
 
 function getCarouselCards() {
   if (typeof CAROUSEL_CARDS === 'undefined' || !Array.isArray(CAROUSEL_CARDS) || !CAROUSEL_CARDS.length) {
@@ -76,7 +83,8 @@ function getCarouselPageCount() {
   const items = document.querySelectorAll('#carouselTrack .carousel-item');
   const n     = items.length;
   if (n === 0) return 0;
-  return Math.ceil(n / VISIBLE_COUNT);
+  const per = getVisibleCount();
+  return Math.ceil(n / per);
 }
 
 function initCarousel() {
@@ -94,8 +102,10 @@ function initCarousel() {
     if (total === 0) return;
 
     const vw   = viewport.clientWidth;
-    const itemW = (vw - CAROUSEL_GAP * (VISIBLE_COUNT - 1)) / VISIBLE_COUNT;
+    const per  = getVisibleCount();
+    const itemW = (vw - CAROUSEL_GAP * (per - 1)) / per;
     list.forEach((el) => { el.style.width = itemW + 'px'; });
+    document.documentElement.style.setProperty('--carousel-item-width', itemW + 'px');
 
     const maxPage = Math.max(0, getCarouselPageCount() - 1);
     if (carouselPage > maxPage) carouselPage = maxPage;
@@ -106,7 +116,7 @@ function initCarousel() {
   }
 
   function applyTranslate(itemW, gap, total) {
-    const perPage  = VISIBLE_COUNT;
+    const perPage  = getVisibleCount();
     const maxPage  = Math.max(0, Math.ceil(total / perPage) - 1);
     const safePage = Math.min(Math.max(0, carouselPage), maxPage);
     if (safePage !== carouselPage) carouselPage = safePage;
@@ -120,8 +130,10 @@ function initCarousel() {
     const total  = list.length;
     if (total === 0) return;
     const vw     = viewport.clientWidth;
-    const itemW  = (vw - CAROUSEL_GAP * (VISIBLE_COUNT - 1)) / VISIBLE_COUNT;
+    const per    = getVisibleCount();
+    const itemW  = (vw - CAROUSEL_GAP * (per - 1)) / per;
     applyTranslate(itemW, CAROUSEL_GAP, total);
+    document.documentElement.style.setProperty('--carousel-item-width', itemW + 'px');
     updateCarouselArrows();
   };
 

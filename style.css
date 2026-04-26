@@ -14,6 +14,8 @@
   --text-muted: #8b85b0;
   --radius: 16px;
   --radius-sm: 10px;
+  /* Set by app.js to match one carousel cell (Popular cards use the same width). */
+  --carousel-item-width: 88px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,7 +54,7 @@ body {
 .logo-accent { color: var(--purple-light); }
 
 /* ===========================
-   CAROUSEL  — 20 cards, 6 visible per page (hero row on first slide)
+   CAROUSEL  — 20 cards; 4 or 5 per view (see app.js) + 5/4 dots
 =========================== */
 .carousel-section { padding: 20px 0 0; scroll-margin-top: 64px; }
 
@@ -101,7 +103,7 @@ body {
   padding: 6px 2px 10px;
 }
 
-/* 6 cards visible: width = (viewport - 5*gap) / 6 */
+/* Width per item set in JS to fit 4 (mobile) or 5 (wide) in the viewport */
 .carousel-item {
   display: flex;
   flex-direction: column;
@@ -136,7 +138,7 @@ body {
 }
 
 .carousel-item p {
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   color: var(--text-muted);
   text-align: center;
   white-space: nowrap;
@@ -327,26 +329,36 @@ body {
 }
 .popular-view-all svg { flex-shrink: 0; opacity: 0.9; }
 
-/* First 6 “hero” cards: same order as top carousel (iTunes, Razer, PUBG, STC, Mobily, Lebara) */
+/* Same card width as top carousel (JS sets --carousel-item-width); flex-wrap: 4+2 etc. on mobile */
 .popular-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 8px;
-}
-@media (max-width: 420px) {
-  .popular-cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: center;
+  gap: 10px;
+  width: 100%;
 }
 
 .pop-card {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  cursor: pointer; transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: var(--carousel-item-width);
+  flex: 0 0 var(--carousel-item-width);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.2s;
 }
 .pop-card:hover { transform: translateY(-3px); }
 
 .pop-img-wrap {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: 9px; overflow: hidden;
+  /* Match .card-img-wrap (portrait) */
+  aspect-ratio: 3 / 5;
+  border-radius: 10px; overflow: hidden;
   border: 1.5px solid var(--border);
   background: var(--card);
   box-shadow: 0 3px 12px rgba(0,0,0,0.35);
