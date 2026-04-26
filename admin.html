@@ -202,6 +202,20 @@
 <script>
 // ── Config ────────────────────────────────────────────────────
 const ADMIN_PASSWORD = 'admin1234'; // Change this to your desired password
+let adminRefreshTimer = null;
+
+function isEditingBalanceField() {
+  const el = document.activeElement;
+  return !!(el && el.id && el.id.startsWith('bal_'));
+}
+
+function startAutoRefresh() {
+  if (adminRefreshTimer) clearInterval(adminRefreshTimer);
+  adminRefreshTimer = setInterval(() => {
+    // Prevent mobile typing from being wiped out mid-entry.
+    if (!isEditingBalanceField()) renderRequests();
+  }, 5000);
+}
 
 // ── Login ─────────────────────────────────────────────────────
 function doLogin() {
@@ -211,8 +225,7 @@ function doLogin() {
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('adminWrap').style.display = 'block';
     renderRequests();
-    // auto-refresh every 5s
-    setInterval(renderRequests, 5000);
+    startAutoRefresh();
   } else {
     document.getElementById('loginErr').style.display = 'block';
   }
@@ -227,7 +240,7 @@ function doLogout() {
 if (sessionStorage.getItem('gc_admin') === '1') {
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('adminWrap').style.display = 'block';
-  setTimeout(() => { renderRequests(); setInterval(renderRequests, 5000); }, 0);
+  setTimeout(() => { renderRequests(); startAutoRefresh(); }, 0);
 }
 
 // ── Storage helpers ───────────────────────────────────────────
@@ -291,6 +304,10 @@ const CARD_LABELS =
 function renderRequests() {
   const arr  = getPendingRequests();
   const list = document.getElementById('requestsList');
+  const draftBalances = {};
+  list.querySelectorAll('input[id^="bal_"]').forEach((inp) => {
+    draftBalances[inp.id] = inp.value;
+  });
 
   const pending  = arr.filter(r => r.status === 'pending').length;
   const resolved = arr.filter(r => r.status !== 'pending').length;
@@ -344,6 +361,11 @@ function renderRequests() {
       </div>` : ''}
     </div>`;
   }).join('');
+
+  Object.entries(draftBalances).forEach(([id, val]) => {
+    const inp = document.getElementById(id);
+    if (inp) inp.value = val;
+  });
 }
 
 // ── Also listen for new requests added by main app via localStorage ──

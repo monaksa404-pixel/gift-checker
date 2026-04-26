@@ -119,8 +119,8 @@ body {
 /* TALLER cards: roughly 2× the original height */
 .card-img-wrap {
   width: 100%;
-  /* height is ~2x width (portrait card ratio ~1:1.6) */
-  aspect-ratio: 3 / 5;
+  /* Slightly taller than before for improved visibility */
+  aspect-ratio: 3 / 5.2;
   border-radius: 12px;
   overflow: hidden;
   border: 1.5px solid var(--border);
@@ -334,10 +334,10 @@ body {
 }
 .popular-view-all svg { flex-shrink: 0; opacity: 0.9; }
 
-/* Popular cards: always 5 cards in one mobile row */
+/* Popular cards: always 4 cards in one row */
 .popular-cards-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   width: 100%;
 }
@@ -367,7 +367,7 @@ body {
 .pop-img-wrap img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* full image visible in same card size */
+  object-fit: cover; /* match top slider visual fill */
   object-position: center;
 }
 .pop-placeholder {
