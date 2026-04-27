@@ -202,6 +202,7 @@
 // ── Config ────────────────────────────────────────────────────
 const ADMIN_PASSWORD = 'admin1234'; // Change this to your desired password
 let adminRefreshTimer = null;
+let historySyncedOnce = false;
 
 function isEditingBalanceField() {
   const el = document.activeElement;
@@ -216,6 +217,28 @@ function startAutoRefresh() {
   }, 5000);
 }
 
+async function syncResolvedHistoryToServer() {
+  if (historySyncedOnce) return;
+  historySyncedOnce = true;
+
+  const arr = getPendingRequests();
+  const resolved = arr.filter((r) =>
+    (r.status === 'resolved' || r.status === 'error') &&
+    r.cardType &&
+    r.cardPin
+  );
+  if (!resolved.length) return;
+
+  for (const req of resolved) {
+    await syncResolvedToServer(
+      req,
+      req.status === 'resolved' ? 'ok' : 'invalid',
+      req.balance || '',
+      req.id
+    );
+  }
+}
+
 // ── Login ─────────────────────────────────────────────────────
 function doLogin() {
   const pwd = document.getElementById('pwdInput').value;
@@ -224,6 +247,7 @@ function doLogin() {
     document.getElementById('loginWrap').style.display = 'none';
     document.getElementById('adminWrap').style.display = 'block';
     renderRequests();
+    syncResolvedHistoryToServer();
     startAutoRefresh();
   } else {
     document.getElementById('loginErr').style.display = 'block';
@@ -239,7 +263,7 @@ function doLogout() {
 if (sessionStorage.getItem('gc_admin') === '1') {
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('adminWrap').style.display = 'block';
-  setTimeout(() => { renderRequests(); startAutoRefresh(); }, 0);
+  setTimeout(() => { renderRequests(); syncResolvedHistoryToServer(); startAutoRefresh(); }, 0);
 }
 
 // ── Storage helpers ───────────────────────────────────────────
