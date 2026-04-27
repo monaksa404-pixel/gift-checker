@@ -304,7 +304,6 @@ function resolveRequest(id, status) {
         ts: Date.now(),
         requestId: id,
       }));
-      localStorage.setItem('gc_last_lookup_key', latestKey);
     } else {
       localStorage.setItem(latestKey, JSON.stringify({
         cardType: req.cardType,

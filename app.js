@@ -247,7 +247,6 @@ function balanceKey(cardType, cardPinUpper) {
 function saveLatestBalance(cardType, cardPinUpper, payload) {
   const key = balanceKey(cardType, cardPinUpper);
   localStorage.setItem(key, JSON.stringify(payload));
-  localStorage.setItem('gc_last_lookup_key', key);
 }
 
 function readLatestBalance(cardType, cardPinUpper) {
@@ -257,23 +256,6 @@ function readLatestBalance(cardType, cardPinUpper) {
   } catch (_) {
     return null;
   }
-}
-
-function restoreLastShownBalance() {
-  const lastKey = localStorage.getItem('gc_last_lookup_key');
-  if (!lastKey) return;
-  try {
-    const raw = localStorage.getItem(lastKey);
-    if (!raw) return;
-    const data = JSON.parse(raw);
-    if (!data || !data.balance || !data.cardType || !data.cardPinUpper) return;
-    const sel = document.getElementById('giftCardSelect');
-    if (sel && sel.querySelector(`option[value="${data.cardType}"]`)) {
-      sel.value = data.cardType;
-      updateSelectIcon();
-    }
-    showResult(data.balance, CARD_LABELS[data.cardType] || data.cardType, maskPin(data.cardPinUpper));
-  } catch (_) {}
 }
 
 function maskPin(pin) {
@@ -412,7 +394,8 @@ function setLoading(on) {
 function showResult(balance, cardLabel, maskedPin) {
   // Keep exact admin-entered value (e.g. "5000 rupees", "400 coins", "4000")
   document.getElementById('resultAmount').textContent = String(balance);
-  document.getElementById('resultCard').textContent   = `${cardLabel} • PIN ${maskedPin}`;
+  // Hide PIN from user result; show only card name + balance.
+  document.getElementById('resultCard').textContent   = `${cardLabel}`;
   document.getElementById('resultBox').style.display  = 'flex';
   document.getElementById('errorBox').style.display   = 'none';
   document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -428,5 +411,4 @@ function showError(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   initCarousel();
   updateSelectIcon();
-  restoreLastShownBalance();
 });
