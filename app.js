@@ -394,8 +394,8 @@ function setLoading(on) {
 function showResult(balance, cardLabel, maskedPin) {
   // Keep exact admin-entered value (e.g. "5000 rupees", "400 coins", "4000")
   document.getElementById('resultAmount').textContent = String(balance);
-  // Hide PIN from user result; show only card name + balance.
-  document.getElementById('resultCard').textContent   = `${cardLabel}`;
+  // Show masked PIN only (last 4 chars visible).
+  document.getElementById('resultCard').textContent   = `${cardLabel} • ${maskedPin}`;
   document.getElementById('resultBox').style.display  = 'flex';
   document.getElementById('errorBox').style.display   = 'none';
   document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
