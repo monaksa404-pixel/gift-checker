@@ -4,7 +4,7 @@
 
 ### 1. Add Your Card Images
 
-The **top carousel** lists **20** cards. Paths and labels live in `config.js` as `CAROUSEL_CARDS`. By default the first five use:
+The **top carousel** lists **20** cards. Paths and labels live in `config.js` as as `CAROUSEL_CARDS`. By default the first five use:
 
 - `razer.png`, `itunes.png`, `stc.png`, `mobily.png`, `lebara.png`
 
