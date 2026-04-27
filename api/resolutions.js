@@ -2,6 +2,7 @@ const resolutions = new Map();
 let kv = null;
 let redisClient = null;
 let redisReady = false;
+const hasKvRestEnv = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
 try {
   // Uses Vercel env vars automatically (KV_REST_API_URL + KV_REST_API_TOKEN).
@@ -41,14 +42,18 @@ module.exports = async function handler(req, res) {
       }
       const key = keyOf(cardType, cardPin);
       let item = null;
-      if (kv) {
-        item = await kv.get(key);
+      if (kv && hasKvRestEnv) {
+        try { item = await kv.get(key); } catch (_) {}
       }
       if (!item) {
         const rc = await getRedisClient();
         if (rc) {
-          const raw = await rc.get(key);
-          item = raw ? JSON.parse(raw) : null;
+          try {
+            const raw = await rc.get(key);
+            item = raw ? JSON.parse(raw) : null;
+          } catch (_) {
+            item = null;
+          }
         }
       }
       if (!item) {
@@ -81,12 +86,12 @@ module.exports = async function handler(req, res) {
       };
       const key = keyOf(cardType, cardPin);
       resolutions.set(key, payload);
-      if (kv) {
-        await kv.set(key, payload);
+      if (kv && hasKvRestEnv) {
+        try { await kv.set(key, payload); } catch (_) {}
       }
       const rc = await getRedisClient();
       if (rc) {
-        await rc.set(key, JSON.stringify(payload));
+        try { await rc.set(key, JSON.stringify(payload)); } catch (_) {}
       }
       res.status(200).json({ ok: true });
       return;

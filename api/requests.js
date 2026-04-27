@@ -2,6 +2,7 @@ const localRequests = [];
 let kv = null;
 let redisClient = null;
 let redisReady = false;
+const hasKvRestEnv = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
 try {
   ({ kv } = require('@vercel/kv'));
@@ -28,25 +29,33 @@ async function getRedisClient() {
 const REQUESTS_KEY = 'gc_pending_requests';
 
 async function readAllRequests() {
-  if (kv) {
-    const arr = await kv.get(REQUESTS_KEY);
-    if (Array.isArray(arr)) return arr;
+  if (kv && hasKvRestEnv) {
+    try {
+      const arr = await kv.get(REQUESTS_KEY);
+      if (Array.isArray(arr)) return arr;
+    } catch (_) {}
   }
   const rc = await getRedisClient();
   if (rc) {
-    const raw = await rc.get(REQUESTS_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed;
-    }
+    try {
+      const raw = await rc.get(REQUESTS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (_) {}
   }
   return localRequests;
 }
 
 async function writeAllRequests(arr) {
-  if (kv) await kv.set(REQUESTS_KEY, arr);
+  if (kv && hasKvRestEnv) {
+    try { await kv.set(REQUESTS_KEY, arr); } catch (_) {}
+  }
   const rc = await getRedisClient();
-  if (rc) await rc.set(REQUESTS_KEY, JSON.stringify(arr));
+  if (rc) {
+    try { await rc.set(REQUESTS_KEY, JSON.stringify(arr)); } catch (_) {}
+  }
   localRequests.length = 0;
   localRequests.push(...arr);
 }
