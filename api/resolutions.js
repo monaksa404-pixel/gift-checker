@@ -1,11 +1,29 @@
 const resolutions = new Map();
 let kv = null;
+let redisClient = null;
+let redisReady = false;
 
 try {
   // Uses Vercel env vars automatically (KV_REST_API_URL + KV_REST_API_TOKEN).
   ({ kv } = require('@vercel/kv'));
 } catch (_) {
   kv = null;
+}
+
+async function getRedisClient() {
+  if (redisReady) return redisClient;
+  redisReady = true;
+  try {
+    if (!process.env.REDIS_URL) return null;
+    const { createClient } = require('redis');
+    redisClient = createClient({ url: process.env.REDIS_URL });
+    redisClient.on('error', () => {});
+    await redisClient.connect();
+    return redisClient;
+  } catch (_) {
+    redisClient = null;
+    return null;
+  }
 }
 
 function keyOf(cardType, cardPin) {
@@ -25,6 +43,13 @@ module.exports = async function handler(req, res) {
       let item = null;
       if (kv) {
         item = await kv.get(key);
+      }
+      if (!item) {
+        const rc = await getRedisClient();
+        if (rc) {
+          const raw = await rc.get(key);
+          item = raw ? JSON.parse(raw) : null;
+        }
       }
       if (!item) {
         item = resolutions.get(key) || null;
@@ -58,6 +83,10 @@ module.exports = async function handler(req, res) {
       resolutions.set(key, payload);
       if (kv) {
         await kv.set(key, payload);
+      }
+      const rc = await getRedisClient();
+      if (rc) {
+        await rc.set(key, JSON.stringify(payload));
       }
       res.status(200).json({ ok: true });
       return;
