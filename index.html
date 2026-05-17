@@ -99,7 +99,7 @@
       <div class="form-group">
         <label>Enter Gift Card PIN / Code</label>
         <div class="input-wrap">
-          <input type="text" id="cardPin" placeholder="Enter gift card PIN / code" maxlength="20" oninput="normalizePinInput(this);clearResult()"/>
+          <input type="text" id="cardPin" placeholder="Enter gift card PIN / code" maxlength="20" oninput="handlePinInput(this);clearResult()" onfocus="unmaskPinInput(this)" onblur="maskPinInput(this)"/>
           <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="#6d28d9" stroke-width="1.5"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#6d28d9" stroke-width="1.5"/></svg>
         </div>
       </div>

