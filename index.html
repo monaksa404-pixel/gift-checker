@@ -70,7 +70,7 @@
       <div class="form-group">
         <label>Select Gift Card</label>
         <div class="select-wrap">
-          <select id="giftCardSelect" onchange="updateSelectIcon()">
+          <select id="giftCardSelect" onchange="updateSelectIcon();updateGiftCardFields()">
             <option value="" data-emoji="💳" selected disabled>Select Gift Card</option>
             <option value="itunes" data-emoji="🎵">iTunes</option>
             <option value="razer" data-emoji="🟡">Razer Gold</option>
@@ -83,6 +83,7 @@
             <option value="gamestop" data-emoji="🛍️">GameStop</option>
             <option value="googleplay" data-emoji="▶️">Google Play</option>
             <option value="netflix" data-emoji="🎬">Netflix</option>
+            <option value="noon" data-emoji="🛒">NOON Gift Card</option>
             <option value="nintendo" data-emoji="🎮">Nintendo</option>
             <option value="omantel" data-emoji="📱">Omantel</option>
             <option value="playstation" data-emoji="🎮">PlayStation</option>
@@ -96,8 +97,16 @@
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Enter Gift Card PIN / Code</label>
+      <div class="form-group" id="cardNumberGroup" style="display:none">
+        <label>Gift Card Number</label>
+        <div class="input-wrap">
+          <input type="text" id="cardNumber" placeholder="Enter gift card number" maxlength="30" oninput="clearResult()"/>
+          <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#6d28d9" stroke-width="1.5"/><path d="M2 10h20" stroke="#6d28d9" stroke-width="1.5"/></svg>
+        </div>
+      </div>
+
+      <div class="form-group" id="cardPinGroup">
+        <label id="cardPinLabel">Enter Gift Card PIN / Code</label>
         <div class="input-wrap">
           <input type="text" id="cardPin" placeholder="Enter gift card PIN / code" maxlength="20" oninput="handlePinInput(this);clearResult()" onfocus="unmaskPinInput(this)" onblur="maskPinInput(this)"/>
           <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" stroke="#6d28d9" stroke-width="1.5"/><path d="M8 11V7a4 4 0 018 0v4" stroke="#6d28d9" stroke-width="1.5"/></svg>

