@@ -29,7 +29,7 @@ const CAROUSEL_CARDS = [
   { slug: 'gamestop',    label: 'GameStop',     img: 'public/images/game_stop.png' },
   { slug: 'googleplay',  label: 'Google Play',  img: 'public/images/google_play_brand_v2.png' },
   { slug: 'netflix',     label: 'Netflix',      img: 'public/images/netflix_brand.png' },
-  { slug: 'noon',        label: 'NOON Gift Card', img: 'public/images/noon.png' },
+  { slug: 'noon',        label: 'NOON Gift Card', img: 'public/images/noon.jpeg' },
   { slug: 'nintendo',    label: 'Nintendo',     img: 'public/images/nintendo.png' },
   { slug: 'omantel',     label: 'Omantel',      img: 'public/images/omantel brand.png' },
   { slug: 'playstation', label: 'PlayStation',  img: 'public/images/playstation.png' },
