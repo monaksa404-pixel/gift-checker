@@ -13,7 +13,7 @@ const CONFIG = {
   POLL_TIMEOUT_MS: 5 * 60 * 1000,   // 5 minutes
 
   // How often to poll for the balance answer (ms)
-  POLL_INTERVAL_MS: 3000,
+  POLL_INTERVAL_MS: 1000,
 };
 
 // ── Top carousel (19 cards) — paths match files in public/images/ ─────────────
